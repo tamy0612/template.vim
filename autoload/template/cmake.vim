@@ -1,6 +1,6 @@
 " insert version
 function! template#cmake#version()
-  let l:cmake_version = substitute(system('cmake --version|cut -d" " -f3|cut -d"." -f1,2'), "\n", "", "g" )
+  let l:cmake_version = s:load_cache()
   normal! gg
   execute "normal! icmake_minimum_required(VERSION " . l:cmake_version . ")\<CR>"
   unlet l:cmake_version
@@ -8,15 +8,16 @@ function! template#cmake#version()
 endfunction
 
 
-function! s:fetch_cmake_version()
+function! s:load_cache()
   if exists("$CACHE_DIR")
-    let l:cache_dir  = "$CACHE_DIR/template.vim"
+    let l:cache_dir  = expand("$CACHE_DIR/template", ":p")
     let l:cache_file = l:cache_dir.'/cmake_version.cache'
     " When cache exists
     if filereadable(l:cache_file)
       return readfile(l:cache_file)[0]
     endif
     " Otherwise
+    echo "Create cache to ".l:cache_file
     if !isdirectory(l:cache_dir)
       call mkdir(l:cache_dir)
     endif
